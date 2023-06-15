@@ -33,15 +33,15 @@ void delay_ms(unsigned int ms);
 void GPIO_toggle13(void);
 
 /*
-char	           1 字节	-128 到 127 或 0 到 255
-unsigned char	   1 字节	0 到 255
-signed char	       1 字节	-128 到 127
-int	               2 或 4 字节	-32,768 到 32,767 或 -2,147,483,648 到 2,147,483,647
-unsigned int	   2 或 4 字节	0 到 65,535 或 0 到 4,294,967,295
-short	           2 字节	-32,768 到 32,767
-unsigned short	   2 字节	0 到 65,535
-long	           4 字节	   -2,147,483,648 到 2,147,483,647
-unsigned long	   4 字节	0 到 4,294,967,295
+char
+unsigned char
+signed char
+int
+unsigned int
+short
+unsigned short
+long
+unsigned long
 */
 
 int main(void)
@@ -50,7 +50,7 @@ int main(void)
 	while (1)
 	{
 		GPIO_toggle13();
-		delay_ms(2000);
+		delay_ms(3000);
 	}
 }
 //
