@@ -50,7 +50,7 @@ int main(void)
 	while (1)
 	{
 		GPIO_toggle13();
-		delay_ms(1000);
+		delay_ms(2000);
 	}
 }
 //
