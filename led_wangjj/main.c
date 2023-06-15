@@ -53,10 +53,6 @@ int main(void)
 	while (1)
 	{
 		GPIO_toggle13();
-		// delay(1000);
-		// delay(1000);
-		// delay(1000);
-		// delay(1000);
 	}
 }
 
