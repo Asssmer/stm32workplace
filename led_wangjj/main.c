@@ -55,7 +55,8 @@ int main(void)
 		GPIO_toggle13();
 	}
 }
-
+//
+//函数定义
 void system_init(void)
 {
 	RCC_CR |= (1 << 0); // 开启HSI
@@ -74,9 +75,7 @@ void system_init(void)
 	GPIOC_CRH &= ~(0xF << ((13 - 8) * 4)); // 清除控制位
 	GPIOC_CRH |= 0b0011 << ((13 - 8) * 4); // 设置PC13为推挽输出
 }
-
 void GPIO_toggle13(void)
 {
-
 	GPIOC_ODR ^= 1 << 13;
 }
