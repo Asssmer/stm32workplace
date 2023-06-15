@@ -1,0 +1,23 @@
+{
+    "workbench.colorCustomizations": {
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#5a56c5",
+        "sideBar.border": "#5a56c5",
+        "statusBar.background": "#3f3bad",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#5a56c5",
+        "statusBarItem.remoteBackground": "#3f3bad",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#3f3bad",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#3f3bad99",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    "peacock.color": "#3f3bad",
+    "files.associations": {
+        "rtc_wang.h": "c",
+        "gpio_wang.h": "c",
+        "tim_wang.h": "c",
+        "C.C": "cpp"
+    }
+}
