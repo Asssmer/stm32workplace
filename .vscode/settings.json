@@ -18,6 +18,8 @@
         "rtc_wang.h": "c",
         "gpio_wang.h": "c",
         "tim_wang.h": "c",
-        "C.C": "cpp"
+        "C.C": "cpp",
+        "type_traits": "c",
+        "xutility": "c"
     }
 }

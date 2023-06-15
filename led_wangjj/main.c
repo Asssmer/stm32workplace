@@ -24,28 +24,25 @@
 
 #define TIM2_BASE 0x40000000
 #define TIM2_CR1 *((volatile unsigned int *)(TIM2_BASE + 0x00))
-#define TIM2_CR2 *((volatile unsigned int *)(TIM2_BASE + 0x04))
-#define TIM2_SMCR *((volatile unsigned int *)(TIM2_BASE + 0x08))
-#define TIM2_DIER *((volatile unsigned int *)(TIM2_BASE + 0x0C))
-#define TIM2_SR *((volatile unsigned int *)(TIM2_BASE + 0x10))
-#define TIM2_EGR *((volatile unsigned int *)(TIM2_BASE + 0x14))
-#define TIM2_CCMR1 *((volatile unsigned int *)(TIM2_BASE + 0x18))
-#define TIM2_CCMR2 *((volatile unsigned int *)(TIM2_BASE + 0x1C))
-#define TIM2_CCER *((volatile unsigned int *)(TIM2_BASE + 0x20))
-#define TIM2_CNT *((volatile unsigned int *)(TIM2_BASE + 0x24))
-#define TIM2_CCER *((volatile unsigned int *)(TIM2_BASE + 0x28))
-#define TIM2_PSC *((volatile unsigned int *)(TIM2_BASE + 0x20))
+#define TIM2_PSC *((volatile unsigned int *)(TIM2_BASE + 0x28))
 #define TIM2_ARR *((volatile unsigned int *)(TIM2_BASE + 0x2C))
-#define TIM2_PSC *((volatile unsigned int *)(TIM2_BASE + 0x20))
-#define TIM2_CCR1 *((volatile unsigned int *)(TIM2_BASE + 0x34))
-#define TIM2_CCR2 *((volatile unsigned int *)(TIM2_BASE + 0x38))
-#define TIM2_CCR3 *((volatile unsigned int *)(TIM2_BASE + 0x3C))
-#define TIM2_CCR4 *((volatile unsigned int *)(TIM2_BASE + 0x40))
-#define TIM2_DCR *((volatile unsigned int *)(TIM2_BASE + 0x48))
-#define TIM2_DMAR *((volatile unsigned int *)(TIM2_BASE + 0x4C))
+#define TIM2_SR *((volatile unsigned int *)(TIM2_BASE + 0x10))
 
 void system_init(void);
+void delay_ms(unsigned int ms);
 void GPIO_toggle13(void);
+
+/*
+char	           1 字节	-128 到 127 或 0 到 255
+unsigned char	   1 字节	0 到 255
+signed char	       1 字节	-128 到 127
+int	               2 或 4 字节	-32,768 到 32,767 或 -2,147,483,648 到 2,147,483,647
+unsigned int	   2 或 4 字节	0 到 65,535 或 0 到 4,294,967,295
+short	           2 字节	-32,768 到 32,767
+unsigned short	   2 字节	0 到 65,535
+long	           4 字节	   -2,147,483,648 到 2,147,483,647
+unsigned long	   4 字节	0 到 4,294,967,295
+*/
 
 int main(void)
 {
@@ -53,10 +50,12 @@ int main(void)
 	while (1)
 	{
 		GPIO_toggle13();
+		delay_ms(1000);
 	}
 }
 //
-//函数定义
+// 函数定义
+//
 void system_init(void)
 {
 	RCC_CR |= (1 << 0); // 开启HSI
@@ -74,8 +73,23 @@ void system_init(void)
 	RCC_APB2ENR |= 1 << 4;				   // 使能PORTC时钟
 	GPIOC_CRH &= ~(0xF << ((13 - 8) * 4)); // 清除控制位
 	GPIOC_CRH |= 0b0011 << ((13 - 8) * 4); // 设置PC13为推挽输出
+
+	RCC_APB1ENR |= 1 ; // 使能TIM2时钟
 }
 void GPIO_toggle13(void)
 {
 	GPIOC_ODR ^= 1 << 13;
+}
+
+void delay_ms(unsigned int ms)
+{
+
+	TIM2_PSC = 72000 - 1; // 使用72000-1的预分频值，使得每个计数周期为1ms
+	TIM2_ARR = ms;		  // 设置自动重载值为所需的延迟毫秒数
+	TIM2_CR1 |= 1;		  // 开启定时器
+	while (!(TIM2_SR & 1))
+	{
+	}				// 等待更新事件标志位
+	TIM2_SR &= ~1;	// 清除更新事件标志位
+	TIM2_CR1 &= ~1; // 关闭定时器
 }
