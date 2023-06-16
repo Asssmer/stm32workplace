@@ -24,8 +24,8 @@
 
 #define TIM2_BASE 0x40000000
 #define TIM2_CR1 *((volatile unsigned int *)(TIM2_BASE + 0x00))
-#define TIM2_PSC *((volatile unsigned int *)(TIM2_BASE + 0x28))
-#define TIM2_ARR *((volatile unsigned int *)(TIM2_BASE + 0x2C))
+#define TIM2_PSC *((volatile unsigned short *)(TIM2_BASE + 0x28))
+#define TIM2_ARR *((volatile unsigned short *)(TIM2_BASE + 0x2C))
 #define TIM2_SR *((volatile unsigned int *)(TIM2_BASE + 0x10))
 
 void system_init(void);
@@ -50,7 +50,7 @@ int main(void)
 	while (1)
 	{
 		GPIO_toggle13();
-		delay_ms(3000);
+		delay_ms(10000);
 	}
 }
 //
@@ -84,7 +84,7 @@ void GPIO_toggle13(void)
 void delay_ms(unsigned int ms)
 {
 
-	TIM2_PSC = 72000 - 1; // 使用72000-1的预分频值，使得每个计数周期为1ms
+	TIM2_PSC = 7200 - 1; // 使用7200-1的预分频值，使得每个计数周期为0.1ms
 	TIM2_ARR = ms;		  // 设置自动重载值为所需的延迟毫秒数
 	TIM2_CR1 |= 1;		  // 开启定时器
 	while (!(TIM2_SR & 1))
