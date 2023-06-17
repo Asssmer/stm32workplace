@@ -72,86 +72,52 @@ typedef unsigned short     uint16_t;
 typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
 */
-unsigned char buff = '\0';
+unsigned char buff = 0x44;
+
+#include "stm32f10x.h"
+
+void USART1_Init(void) 
+{
+    // 使能USART1和GPIOA时钟
+    RCC_APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_IOPAEN;
+    
+    // 设置PA9为复用推挽输出
+    GPIOA_CRH &= ~GPIO_CRH_MODE9;
+    GPIOA_CRH |= GPIO_CRH_MODE9_0 | GPIO_CRH_MODE9_1;
+    GPIOA_CRH &= ~GPIO_CRH_CNF9;
+    GPIOA_CRH |= GPIO_CRH_CNF9_1;
+    
+    // 设置PA10为输入悬空（浮空输入）
+    GPIOA_CRH &= ~GPIO_CRH_MODE10;
+    GPIOA_CRH &= ~GPIO_CRH_CNF10;
+    GPIOA_CRH |= GPIO_CRH_CNF10_0;
+    
+    // 设置USART参数
+    USART1_BRR = 0x1D4C; // 波特率为9600，假设PCLK2 = 72MHz
+    USART1_CR1 |= USART_CR1_TE; // 使能串口发送
+    USART1_CR1 |= USART_CR1_UE; // 使能串口
+}
+
+void USART1_SendChar(char ch)
+{
+    while (!(USART1_SR & USART_SR_TXE)); // 等待发送数据寄存器为空
+    USART1_DR = (uint8_t)ch; // 写入数据
+}
 
 int main(void)
 {
-	system_init();
-	// while (1)
-	// {
-	GPIO_toggle13();
-	// 	delay_ms(10000);
-	// }
-	while (1)
-	{
-		UART1_receive(&buff);
-		UART1_send(&buff);
-	}
-}
-//
-// 函数定义
-//
-void system_init(void)
-{
-	RCC_CR |= (1 << 0); // 开启HSI
-	while (!(RCC_CR & (1 << 1)))
-	{
-	}; // 等待HSI准备好
-
-	RCC_CFGR |= (int)1 << 16; // 设置为PLL输入
-	RCC_CFGR |= 0b0111 << 18; // 分频9倍,达到72Mhz
-	RCC_CFGR |= 0b0100 << 8;  // 分频2倍,APB1降低为36Mhz
-	RCC_CR |= (int)1 << 24;	  // 使能PLL,等待ready
-	while (!RCC_CR & ((int)1 << 25))
-	{
-	}
-	RCC_APB2ENR |= 1 << 4;				   // 使能PORTC时钟
-	GPIOC_CRH &= ~(0xF << ((13 - 8) * 4)); // 清除控制位
-	GPIOC_CRH |= 0b0011 << ((13 - 8) * 4); // 设置PC13为推挽输出
-
-	RCC_APB1ENR |= 1; // 使能TIM2时钟
-
-	RCC_APB2ENR |= 1 << 2;	// 使能USART1时钟
-	RCC_APB2ENR |= 1 << 14; // 使能GPIOA时钟
-
-	GPIOA_CRH &= ~0xFF << 4;	  // 清除PA9,PA10控制位
-	GPIOA_CRH |= 0b01001011 << 4; // 设置PA9为复用推挽输出,PA10为浮空输入
-
-	USART1_BRR = 72000000 / 9600; // 设置波特率为9600
-	USART1_CR1 &= ~(1 << 12);	  // 设置字长
-	USART1_CR2 &= ~(0b11 << 12);  // 设置停止位
-	USART1_CR1 |= 1 << 2;		  // 使能接收RE
-	USART1_CR1 |= 1 << 3;		  // 使能发送TE
-	USART1_CR1 |= 1 << 13;		  // 使能USART1,UE
-}
-void GPIO_toggle13(void)
-{
-	GPIOC_ODR ^= 1 << 13;
-}
-void delay_ms(unsigned int ms)
-{
-
-	TIM2_PSC = 7200 - 1; // 使用7200-1的预分频值，使得每个计数周期为0.1ms
-	TIM2_ARR = ms;		 // 设置自动重载值为所需的延迟毫秒数
-	TIM2_CR1 |= 1;		 // 开启定时器
-	while (!(TIM2_SR & 1))
-	{
-	}				// 等待更新事件标志位
-	TIM2_SR &= ~1;	// 清除更新事件标志位
-	TIM2_CR1 &= ~1; // 关闭定时器
-}
-void UART1_send(unsigned char *data)
-{
-	while (!(USART1_SR & (1 << 7)))
-		; // 等待TXE标志位为1
-	USART1_DR = (unsigned int)*data; // 写入数据
-	while (!(USART1_SR & (1 << 6)))
-		; // 等待TC标志位为1
-}
-void UART1_receive(unsigned char *data)
-{
-
-	while (!(USART1_SR & (1 << 5)))
-		;			   // 等待RXNE标志位为1
-	*data = USART1_DR; // 读取数据
+    USART1_Init();
+    
+    while (1)
+    {
+        USART1_SendChar('H');
+        USART1_SendChar('e');
+        USART1_SendChar('l');
+        USART1_SendChar('l');
+        USART1_SendChar('o');
+        USART1_SendChar('\r');
+        USART1_SendChar('\n');
+        
+        for (volatile int i = 0; i < 5000000; i++); // 延迟
+    }
 }
