@@ -20,6 +20,8 @@
         "tim_wang.h": "c",
         "C.C": "cpp",
         "type_traits": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "algorithm": "c",
+        "xmemory": "c"
     }
 }
