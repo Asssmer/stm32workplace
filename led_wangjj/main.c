@@ -67,6 +67,92 @@
 #define NVIC_IPR0 *((volatile unsigned int *)(NVIC_BASE + 0x300 + (0 * 4)))
 #define NVIC_IPR9 *((volatile unsigned int *)(NVIC_BASE + 0x300 + (9 * 4)))
 
+
+// DMA1 Base Address
+#define DMA1_BASE 0x40020000
+#define DMA1_ISR  *((volatile unsigned int *)(DMA1_BASE + 0x00))
+#define DMA1_IFCR *((volatile unsigned int *)(DMA1_BASE + 0x04))
+
+// DMA1 Channel 1
+#define DMA1_CCR1   *((volatile unsigned int *)(DMA1_BASE + 0x08))
+#define DMA1_CNDTR1 *((volatile unsigned int *)(DMA1_BASE + 0x0C))
+#define DMA1_CPAR1  *((volatile unsigned int *)(DMA1_BASE + 0x10))
+#define DMA1_CMAR1  *((volatile unsigned int *)(DMA1_BASE + 0x14))
+
+// DMA1 Channel 2
+#define DMA1_CCR2   *((volatile unsigned int *)(DMA1_BASE + 0x1C))
+#define DMA1_CNDTR2 *((volatile unsigned int *)(DMA1_BASE + 0x20))
+#define DMA1_CPAR2  *((volatile unsigned int *)(DMA1_BASE + 0x24))
+#define DMA1_CMAR2  *((volatile unsigned int *)(DMA1_BASE + 0x28))
+
+// DMA1 Channel 3
+#define DMA1_CCR3   *((volatile unsigned int *)(DMA1_BASE + 0x30))
+#define DMA1_CNDTR3 *((volatile unsigned int *)(DMA1_BASE + 0x34))
+#define DMA1_CPAR3  *((volatile unsigned int *)(DMA1_BASE + 0x38))
+#define DMA1_CMAR3  *((volatile unsigned int *)(DMA1_BASE + 0x3C))
+
+// DMA1 Channel 4
+#define DMA1_CCR4   *((volatile unsigned int *)(DMA1_BASE + 0x44))
+#define DMA1_CNDTR4 *((volatile unsigned int *)(DMA1_BASE + 0x48))
+#define DMA1_CPAR4  *((volatile unsigned int *)(DMA1_BASE + 0x4C))
+#define DMA1_CMAR4  *((volatile unsigned int *)(DMA1_BASE + 0x50))
+
+// DMA1 Channel 5
+#define DMA1_CCR5   *((volatile unsigned int *)(DMA1_BASE + 0x58))
+#define DMA1_CNDTR5 *((volatile unsigned int *)(DMA1_BASE + 0x5C))
+#define DMA1_CPAR5  *((volatile unsigned int *)(DMA1_BASE + 0x60))
+#define DMA1_CMAR5  *((volatile unsigned int *)(DMA1_BASE + 0x64))
+
+// DMA1 Channel 6
+#define DMA1_CCR6   *((volatile unsigned int *)(DMA1_BASE + 0x6C))
+#define DMA1_CNDTR6 *((volatile unsigned int *)(DMA1_BASE + 0x70))
+#define DMA1_CPAR6  *((volatile unsigned int *)(DMA1_BASE + 0x74))
+#define DMA1_CMAR6  *((volatile unsigned int *)(DMA1_BASE + 0x78))
+
+// DMA1 Channel 7
+#define DMA1_CCR7   *((volatile unsigned int *)(DMA1_BASE + 0x80))
+#define DMA1_CNDTR7 *((volatile unsigned int *)(DMA1_BASE + 0x84))
+#define DMA1_CPAR7  *((volatile unsigned int *)(DMA1_BASE + 0x88))
+#define DMA1_CMAR7  *((volatile unsigned int *)(DMA1_BASE + 0x8C))
+
+// DMA2 Base Address
+#define DMA2_BASE 0x40020400
+#define DMA2_ISR  *((volatile unsigned int *)(DMA2_BASE + 0x00))
+#define DMA2_IFCR *((volatile unsigned int *)(DMA2_BASE + 0x04))
+
+// DMA2 Channel 1
+#define DMA2_CCR1   *((volatile unsigned int *)(DMA2_BASE + 0x08))
+#define DMA2_CNDTR1 *((volatile unsigned int *)(DMA2_BASE + 0x0C))
+#define DMA2_CPAR1  *((volatile unsigned int *)(DMA2_BASE + 0x10))
+#define DMA2_CMAR1  *((volatile unsigned int *)(DMA2_BASE + 0x14))
+
+// DMA2 Channel 2
+#define DMA2_CCR2   *((volatile unsigned int *)(DMA2_BASE + 0x1C))
+#define DMA2_CNDTR2 *((volatile unsigned int *)(DMA2_BASE + 0x20))
+#define DMA2_CPAR2  *((volatile unsigned int *)(DMA2_BASE + 0x24))
+#define DMA2_CMAR2  *((volatile unsigned int *)(DMA2_BASE + 0x28))
+
+// DMA2 Channel 3
+#define DMA2_CCR3   *((volatile unsigned int *)(DMA2_BASE + 0x30))
+#define DMA2_CNDTR3 *((volatile unsigned int *)(DMA2_BASE + 0x34))
+#define DMA2_CPAR3  *((volatile unsigned int *)(DMA2_BASE + 0x38))
+#define DMA2_CMAR3  *((volatile unsigned int *)(DMA2_BASE + 0x3C))
+
+// DMA2 Channel 4
+#define DMA2_CCR4   *((volatile unsigned int *)(DMA2_BASE + 0x44))
+#define DMA2_CNDTR4 *((volatile unsigned int *)(DMA2_BASE + 0x48))
+#define DMA2_CPAR4  *((volatile unsigned int *)(DMA2_BASE + 0x4C))
+#define DMA2_CMAR4  *((volatile unsigned int *)(DMA2_BASE + 0x50))
+
+// DMA2 Channel 5
+#define DMA2_CCR5   *((volatile unsigned int *)(DMA2_BASE + 0x58))
+#define DMA2_CNDTR5 *((volatile unsigned int *)(DMA2_BASE + 0x5C))
+#define DMA2_CPAR5  *((volatile unsigned int *)(DMA2_BASE + 0x60))
+#define DMA2_CMAR5  *((volatile unsigned int *)(DMA2_BASE + 0x64))
+
+
+
+
 void system_init(void);
 void delay_ms(unsigned int ms);
 void GPIO_toggle13(void);
@@ -156,9 +242,7 @@ void system_init(void)
 	USART1_CR2 &= ~(0b11 << 12);  // 设置停止位
 	USART1_CR1 |= 1 << 5;		  // 使能接收中断
 	NVIC_ISER1 |= (1 << 5);		  // 设置NVIC，使能USART1全局中断
-	// 设置NVIC，优先级配置
-	// 对于STM32F10x系列，可以设定抢占优先级和子优先级。这里我们假设设定为0x20，即抢占优先级为2，子优先级为0
-	NVIC_IPR9 |= 0xF << (8 + 4);
+	NVIC_IPR9 |= 0xF << (8 + 4);  // 设置NVIC，优先级配置
 
 	USART1_CR1 |= 1 << 2;  // 使能接收RE
 	USART1_CR1 |= 1 << 3;  // 使能发送TE
