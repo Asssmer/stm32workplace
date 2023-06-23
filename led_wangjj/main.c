@@ -1,4 +1,6 @@
+#define STM32F10X_MD
 #include "stm32f10x.h"
+
 #define RCC_BASE 0x40021000
 
 #define RCC_CR *((volatile unsigned int *)(RCC_BASE + 0x00))
@@ -153,10 +155,8 @@
 void system_init(void);
 void delay_ms(unsigned int ms);
 void GPIO_toggle13(void);
-void UART1_send(unsigned char *data);
 // void UART1_receive(unsigned char *data);
 unsigned char is_button_pressed(void);
-
 void USART1_DMA_send(unsigned char *buffer, unsigned short length);
 
 /*
@@ -180,7 +180,7 @@ typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
 */
 unsigned char buff = '\0';
-unsigned char buff_uart1_send[] = "hello world";
+unsigned char buff_uart1_send[] = "hello world\n";
 unsigned char buff_uart1_receive[256];
 
 int main(void)
@@ -190,7 +190,9 @@ int main(void)
 	while (1)
 	{
 		USART1_DMA_send(&buff_uart1_send[0], sizeof(buff_uart1_send));
-		delay_ms(1000);
+		delay_ms(2000);
+		// USART1_DMA_send(&buff_uart1_send[0], sizeof(buff_uart1_send));
+		// delay_ms(1000);
 	}
 }
 //
@@ -218,11 +220,26 @@ void system_init(void)
 	RCC_AHBENR |= 1;		// 使能DMA1时钟
 
 	// NVIC配置
-	NVIC_ISER1 |= (1 << 5);		 // 使能USART1全局中断
-	NVIC_IPR9 |= 0xF << (8 + 4); // USART1优先级配置
+	/*
+	void __disable_irq(void) // Disable Interrupts
+	void __enable_irq(void) // Enable Interrupts
 
-	NVIC_ISER0 |= (1 << 14);	 // 使能DMA14全局中断
-	NVIC_IPR3 |= 0xF << (8 + 4); // DMA14优先级配置
+	void NVIC_SetPriorityGrouping(uint32_t priority_grouping)
+	void NVIC_EnableIRQ(IRQn_t IRQn)
+	void NVIC_DisableIRQ(IRQn_t IRQn)
+	uint32_t NVIC_GetPendingIRQ (IRQn_t IRQn)
+	void NVIC_SetPendingIRQ (IRQn_t IRQn)
+	void NVIC_ClearPendingIRQ (IRQn_t IRQn)
+	uint32_t NVIC_GetActive (IRQn_t IRQn)
+	void NVIC_SetPriority (IRQn_t IRQn, uint32_t priority)
+	uint32_t NVIC_GetPriority (IRQn_t IRQn)
+	void NVIC_SystemReset (void)
+	*/
+	NVIC_EnableIRQ(USART1_IRQn);	   // 使能USART1全局中断
+	NVIC_SetPriority(USART1_IRQn, 10); // USART1优先级10
+
+	NVIC_EnableIRQ(DMA1_Channel4_IRQn);		  // 使能DMA14全局中断
+	NVIC_SetPriority(DMA1_Channel4_IRQn, 10); // DMA14优先级10
 
 	// LED灯
 	GPIOC_CRH &= ~(0xF << ((13 - 8) * 4)); // 清除控制位
@@ -233,9 +250,8 @@ void system_init(void)
 	GPIOA_ODR |= 0b1 << 1;		 // 启用PA1为内部上拉电阻
 
 	// UART1 for DMA1
-	DMA1_CCR4 &= ~1;	 // 先确定关闭通道
-	DMA1_CCR4 |= 1 << 4; // 方向:存储器-->外设
-	// DMA2_CCR4 |= 1 << 5;		  // 循环模式
+	DMA1_CCR4 &= ~1;			// 先关闭通道
+	DMA1_CCR4 |= 1 << 4;		// 方向:存储器-->外设
 	DMA1_CCR4 |= 1 << 7;		// 存储器增量模式
 	DMA1_CCR4 |= 1 << 1;		// 使能TCIE
 	DMA1_CCR4 &= ~(0b00 << 8);	// 外设数据宽度8
@@ -273,31 +289,16 @@ void delay_ms(unsigned int ms)
 	TIM2_SR &= ~1;	// 清除更新事件标志位
 	TIM2_CR1 &= ~1; // 关闭定时器
 }
-void UART1_send(unsigned char *data)
-{
-	while (!(USART1_SR & (1 << 7)))
-		;			   // 等待TXE标志位为1
-	USART1_DR = *data; // 写入数据
-	while (!(USART1_SR & (1 << 6)))
-		; // 等待TC标志位为1
-}
 void USART1_DMA_send(unsigned char *buffer, unsigned short length)
 {
-	while (DMA1_CCR4 & 1)
-	{
-		// Wait if DMA1 Channel 4 is enabled
-	}					 // 先确定关闭通道
-	DMA1_CMAR4 = buffer; // 内存地址映射
+	// while (DMA1_CCR4 & 1)
+	// {
+	// } // 先确定关闭通道
+	DMA1_CMAR4 = buffer;
 	DMA1_CNDTR4 = length;
 	DMA1_CCR4 |= 1; // 开启通道
 }
 
-// void UART1_receive(unsigned char *data)
-// {
-// 	while (!(USART1_SR & (1 << 5)))
-// 		;			   // 等待RXNE标志位为1
-// 	*data = USART1_DR; // 读取数据
-// }
 unsigned char is_button_pressed(void)
 {
 	static unsigned char button_state = 0;
@@ -315,24 +316,21 @@ unsigned char is_button_pressed(void)
 	}
 	return button_state;
 }
+
 //
 // 中断处理函数
 //
 void USART1_IRQHandler(void)
-
 {
 	buff = USART1_DR;
-	UART1_send(&buff);
 	GPIO_toggle13();
 }
-// DMA传输完成中断服务程序
 void DMA1_Channel4_IRQHandler(void)
 {
-	if (DMA1_ISR & (1 << 13))
+	while (DMA1_ISR & (1 << 13))
 	{
-		// 清除传输完成中断标志
-		DMA1_IFCR |= (1 << 13);
-		// 关闭DMA通道
-		DMA1_CCR4 &= ~1;
+		GPIO_toggle13();
+		DMA1_IFCR |= (1 << 13); // 清除传输完成中断标志
+		DMA1_CCR4 &= ~1;		// 关闭DMA通道
 	}
 }

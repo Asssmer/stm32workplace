@@ -22,6 +22,7 @@
         "type_traits": "c",
         "xutility": "c",
         "algorithm": "c",
-        "xmemory": "c"
+        "xmemory": "c",
+        "stm32f10x.h": "c"
     }
 }
