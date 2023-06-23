@@ -65,93 +65,90 @@
 #define NVIC_IABR2 *((volatile unsigned int *)(NVIC_BASE + 0x208))
 
 #define NVIC_IPR0 *((volatile unsigned int *)(NVIC_BASE + 0x300 + (0 * 4)))
+#define NVIC_IPR3 *((volatile unsigned int *)(NVIC_BASE + 0x300 + (3 * 4)))
 #define NVIC_IPR9 *((volatile unsigned int *)(NVIC_BASE + 0x300 + (9 * 4)))
-
 
 // DMA1 Base Address
 #define DMA1_BASE 0x40020000
-#define DMA1_ISR  *((volatile unsigned int *)(DMA1_BASE + 0x00))
+#define DMA1_ISR *((volatile unsigned int *)(DMA1_BASE + 0x00))
 #define DMA1_IFCR *((volatile unsigned int *)(DMA1_BASE + 0x04))
 
 // DMA1 Channel 1
-#define DMA1_CCR1   *((volatile unsigned int *)(DMA1_BASE + 0x08))
+#define DMA1_CCR1 *((volatile unsigned int *)(DMA1_BASE + 0x08))
 #define DMA1_CNDTR1 *((volatile unsigned int *)(DMA1_BASE + 0x0C))
-#define DMA1_CPAR1  *((volatile unsigned int *)(DMA1_BASE + 0x10))
-#define DMA1_CMAR1  *((volatile unsigned int *)(DMA1_BASE + 0x14))
+#define DMA1_CPAR1 *((volatile unsigned int *)(DMA1_BASE + 0x10))
+#define DMA1_CMAR1 *((volatile unsigned int *)(DMA1_BASE + 0x14))
 
 // DMA1 Channel 2
-#define DMA1_CCR2   *((volatile unsigned int *)(DMA1_BASE + 0x1C))
+#define DMA1_CCR2 *((volatile unsigned int *)(DMA1_BASE + 0x1C))
 #define DMA1_CNDTR2 *((volatile unsigned int *)(DMA1_BASE + 0x20))
-#define DMA1_CPAR2  *((volatile unsigned int *)(DMA1_BASE + 0x24))
-#define DMA1_CMAR2  *((volatile unsigned int *)(DMA1_BASE + 0x28))
+#define DMA1_CPAR2 *((volatile unsigned int *)(DMA1_BASE + 0x24))
+#define DMA1_CMAR2 *((volatile unsigned int *)(DMA1_BASE + 0x28))
 
 // DMA1 Channel 3
-#define DMA1_CCR3   *((volatile unsigned int *)(DMA1_BASE + 0x30))
+#define DMA1_CCR3 *((volatile unsigned int *)(DMA1_BASE + 0x30))
 #define DMA1_CNDTR3 *((volatile unsigned int *)(DMA1_BASE + 0x34))
-#define DMA1_CPAR3  *((volatile unsigned int *)(DMA1_BASE + 0x38))
-#define DMA1_CMAR3  *((volatile unsigned int *)(DMA1_BASE + 0x3C))
+#define DMA1_CPAR3 *((volatile unsigned int *)(DMA1_BASE + 0x38))
+#define DMA1_CMAR3 *((volatile unsigned int *)(DMA1_BASE + 0x3C))
 
 // DMA1 Channel 4
-#define DMA1_CCR4   *((volatile unsigned int *)(DMA1_BASE + 0x44))
+#define DMA1_CCR4 *((volatile unsigned int *)(DMA1_BASE + 0x44))
 #define DMA1_CNDTR4 *((volatile unsigned int *)(DMA1_BASE + 0x48))
-#define DMA1_CPAR4  *((volatile unsigned int *)(DMA1_BASE + 0x4C))
-#define DMA1_CMAR4  *((volatile unsigned int *)(DMA1_BASE + 0x50))
+#define DMA1_CPAR4 *((volatile unsigned int *)(DMA1_BASE + 0x4C))
+#define DMA1_CMAR4 *((volatile unsigned int *)(DMA1_BASE + 0x50))
 
 // DMA1 Channel 5
-#define DMA1_CCR5   *((volatile unsigned int *)(DMA1_BASE + 0x58))
+#define DMA1_CCR5 *((volatile unsigned int *)(DMA1_BASE + 0x58))
 #define DMA1_CNDTR5 *((volatile unsigned int *)(DMA1_BASE + 0x5C))
-#define DMA1_CPAR5  *((volatile unsigned int *)(DMA1_BASE + 0x60))
-#define DMA1_CMAR5  *((volatile unsigned int *)(DMA1_BASE + 0x64))
+#define DMA1_CPAR5 *((volatile unsigned int *)(DMA1_BASE + 0x60))
+#define DMA1_CMAR5 *((volatile unsigned int *)(DMA1_BASE + 0x64))
 
 // DMA1 Channel 6
-#define DMA1_CCR6   *((volatile unsigned int *)(DMA1_BASE + 0x6C))
+#define DMA1_CCR6 *((volatile unsigned int *)(DMA1_BASE + 0x6C))
 #define DMA1_CNDTR6 *((volatile unsigned int *)(DMA1_BASE + 0x70))
-#define DMA1_CPAR6  *((volatile unsigned int *)(DMA1_BASE + 0x74))
-#define DMA1_CMAR6  *((volatile unsigned int *)(DMA1_BASE + 0x78))
+#define DMA1_CPAR6 *((volatile unsigned int *)(DMA1_BASE + 0x74))
+#define DMA1_CMAR6 *((volatile unsigned int *)(DMA1_BASE + 0x78))
 
 // DMA1 Channel 7
-#define DMA1_CCR7   *((volatile unsigned int *)(DMA1_BASE + 0x80))
+#define DMA1_CCR7 *((volatile unsigned int *)(DMA1_BASE + 0x80))
 #define DMA1_CNDTR7 *((volatile unsigned int *)(DMA1_BASE + 0x84))
-#define DMA1_CPAR7  *((volatile unsigned int *)(DMA1_BASE + 0x88))
-#define DMA1_CMAR7  *((volatile unsigned int *)(DMA1_BASE + 0x8C))
+#define DMA1_CPAR7 *((volatile unsigned int *)(DMA1_BASE + 0x88))
+#define DMA1_CMAR7 *((volatile unsigned int *)(DMA1_BASE + 0x8C))
 
 // DMA2 Base Address
 #define DMA2_BASE 0x40020400
-#define DMA2_ISR  *((volatile unsigned int *)(DMA2_BASE + 0x00))
+#define DMA2_ISR *((volatile unsigned int *)(DMA2_BASE + 0x00))
 #define DMA2_IFCR *((volatile unsigned int *)(DMA2_BASE + 0x04))
 
 // DMA2 Channel 1
-#define DMA2_CCR1   *((volatile unsigned int *)(DMA2_BASE + 0x08))
+#define DMA2_CCR1 *((volatile unsigned int *)(DMA2_BASE + 0x08))
 #define DMA2_CNDTR1 *((volatile unsigned int *)(DMA2_BASE + 0x0C))
-#define DMA2_CPAR1  *((volatile unsigned int *)(DMA2_BASE + 0x10))
-#define DMA2_CMAR1  *((volatile unsigned int *)(DMA2_BASE + 0x14))
+#define DMA2_CPAR1 *((volatile unsigned int *)(DMA2_BASE + 0x10))
+#define DMA2_CMAR1 *((volatile unsigned int *)(DMA2_BASE + 0x14))
 
 // DMA2 Channel 2
-#define DMA2_CCR2   *((volatile unsigned int *)(DMA2_BASE + 0x1C))
+#define DMA2_CCR2 *((volatile unsigned int *)(DMA2_BASE + 0x1C))
 #define DMA2_CNDTR2 *((volatile unsigned int *)(DMA2_BASE + 0x20))
-#define DMA2_CPAR2  *((volatile unsigned int *)(DMA2_BASE + 0x24))
-#define DMA2_CMAR2  *((volatile unsigned int *)(DMA2_BASE + 0x28))
+#define DMA2_CPAR2 *((volatile unsigned int *)(DMA2_BASE + 0x24))
+#define DMA2_CMAR2 *((volatile unsigned int *)(DMA2_BASE + 0x28))
 
 // DMA2 Channel 3
-#define DMA2_CCR3   *((volatile unsigned int *)(DMA2_BASE + 0x30))
+#define DMA2_CCR3 *((volatile unsigned int *)(DMA2_BASE + 0x30))
 #define DMA2_CNDTR3 *((volatile unsigned int *)(DMA2_BASE + 0x34))
-#define DMA2_CPAR3  *((volatile unsigned int *)(DMA2_BASE + 0x38))
-#define DMA2_CMAR3  *((volatile unsigned int *)(DMA2_BASE + 0x3C))
+#define DMA2_CPAR3 *((volatile unsigned int *)(DMA2_BASE + 0x38))
+#define DMA2_CMAR3 *((volatile unsigned int *)(DMA2_BASE + 0x3C))
 
 // DMA2 Channel 4
-#define DMA2_CCR4   *((volatile unsigned int *)(DMA2_BASE + 0x44))
+#define DMA2_CCR4 *((volatile unsigned int *)(DMA2_BASE + 0x44))
 #define DMA2_CNDTR4 *((volatile unsigned int *)(DMA2_BASE + 0x48))
-#define DMA2_CPAR4  *((volatile unsigned int *)(DMA2_BASE + 0x4C))
-#define DMA2_CMAR4  *((volatile unsigned int *)(DMA2_BASE + 0x50))
+#define DMA2_CPAR4 *((volatile unsigned int *)(DMA2_BASE + 0x4C))
+#define DMA2_CMAR4 *((volatile unsigned int *)(DMA2_BASE + 0x50))
 
 // DMA2 Channel 5
-#define DMA2_CCR5   *((volatile unsigned int *)(DMA2_BASE + 0x58))
+#define DMA2_CCR5 *((volatile unsigned int *)(DMA2_BASE + 0x58))
 #define DMA2_CNDTR5 *((volatile unsigned int *)(DMA2_BASE + 0x5C))
-#define DMA2_CPAR5  *((volatile unsigned int *)(DMA2_BASE + 0x60))
-#define DMA2_CMAR5  *((volatile unsigned int *)(DMA2_BASE + 0x64))
-
-
-
+#define DMA2_CPAR5 *((volatile unsigned int *)(DMA2_BASE + 0x60))
+#define DMA2_CMAR5 *((volatile unsigned int *)(DMA2_BASE + 0x64))
 
 void system_init(void);
 void delay_ms(unsigned int ms);
@@ -159,6 +156,8 @@ void GPIO_toggle13(void);
 void UART1_send(unsigned char *data);
 // void UART1_receive(unsigned char *data);
 unsigned char is_button_pressed(void);
+
+void USART1_DMA_send(unsigned char *buffer, unsigned short length);
 
 /*
 char
@@ -181,34 +180,25 @@ typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
 */
 unsigned char buff = '\0';
+unsigned char buff_uart1_send[] = "hello world";
+unsigned char buff_uart1_receive[256];
 
 int main(void)
 {
 	system_init();
 
-	// 闪烁LED
-	// while (1)
-	// {
-	// 	GPIO_toggle13();
-	// 	delay_ms(10000);
-	// }
-	// 串口收发
-	UART1_send("here we go!");
 	while (1)
 	{
-		// UART1_receive(&buff);
+		USART1_DMA_send(&buff_uart1_send[0], sizeof(buff_uart1_send));
+		delay_ms(1000);
 	}
-	// 按键测试
-	// 	while (1)
-	// 	{
-	// 		is_button_pressed();
-	// 	}
 }
 //
 // 函数定义
 //
 void system_init(void)
 {
+	// RCC配置
 	RCC_CR |= (1 << 0); // 开启HSI
 	while (!(RCC_CR & (1 << 1)))
 	{
@@ -221,28 +211,46 @@ void system_init(void)
 	while (!RCC_CR & ((int)1 << 25))
 	{
 	}
-	RCC_APB2ENR |= 1 << 4;				   // 使能PORTC时钟
-	GPIOC_CRH &= ~(0xF << ((13 - 8) * 4)); // 清除控制位
-	GPIOC_CRH |= 0b0011 << ((13 - 8) * 4); // 设置PC13为推挽输出
-
-	RCC_APB1ENR |= 1; // 使能TIM2时钟
-
+	RCC_APB2ENR |= 1 << 4;	// 使能PORTC时钟
+	RCC_APB1ENR |= 1;		// 使能TIM2时钟
 	RCC_APB2ENR |= 1 << 2;	// 使能USART1时钟
 	RCC_APB2ENR |= 1 << 14; // 使能GPIOA时钟
+	RCC_AHBENR |= 1;		// 使能DMA1时钟
 
-	GPIOA_CRH &= ~(0xFF << 4);	  // 清除PA9,PA10控制位
-	GPIOA_CRH |= 0b01001011 << 4; // 设置PA9为复用推挽输出,PA10为浮空输入
+	// NVIC配置
+	NVIC_ISER1 |= (1 << 5);		 // 使能USART1全局中断
+	NVIC_IPR9 |= 0xF << (8 + 4); // USART1优先级配置
 
+	NVIC_ISER0 |= (1 << 14);	 // 使能DMA14全局中断
+	NVIC_IPR3 |= 0xF << (8 + 4); // DMA14优先级配置
+
+	// LED灯
+	GPIOC_CRH &= ~(0xF << ((13 - 8) * 4)); // 清除控制位
+	GPIOC_CRH |= 0b0011 << ((13 - 8) * 4); // 设置PC13为推挽输出
+	// 按键
 	GPIOA_CRL &= ~(0b1111 << 4); // 清除PA1控制位
 	GPIOA_CRL |= 0b1000 << 4;	 // 设置PA1为上拉/下拉输入
 	GPIOA_ODR |= 0b1 << 1;		 // 启用PA1为内部上拉电阻
 
+	// UART1 for DMA1
+	DMA1_CCR4 &= ~1;	 // 先确定关闭通道
+	DMA1_CCR4 |= 1 << 4; // 方向:存储器-->外设
+	// DMA2_CCR4 |= 1 << 5;		  // 循环模式
+	DMA1_CCR4 |= 1 << 7;		// 存储器增量模式
+	DMA1_CCR4 |= 1 << 1;		// 使能TCIE
+	DMA1_CCR4 &= ~(0b00 << 8);	// 外设数据宽度8
+	DMA1_CCR4 &= ~(0b00 << 10); // 存储器数据宽度8
+	DMA1_CCR4 |= 0b10 << 12;	// 通道优先级
+	DMA1_CPAR4 = &USART1_DR;	// 设置外设寄存器地址
+	USART1_CR3 |= 1 << 7;		// 使能串口1的发送DMA
+
+	// USART1
+	GPIOA_CRH &= ~(0xFF << 4);	  // 清除PA9,PA10控制位
+	GPIOA_CRH |= 0b01001011 << 4; // 设置PA9为复用推挽输出,PA10为浮空输入
 	USART1_BRR = 72000000 / 9600; // 设置波特率为9600
 	USART1_CR1 &= ~(1 << 12);	  // 设置字长
 	USART1_CR2 &= ~(0b11 << 12);  // 设置停止位
 	USART1_CR1 |= 1 << 5;		  // 使能接收中断
-	NVIC_ISER1 |= (1 << 5);		  // 设置NVIC，使能USART1全局中断
-	NVIC_IPR9 |= 0xF << (8 + 4);  // 设置NVIC，优先级配置
 
 	USART1_CR1 |= 1 << 2;  // 使能接收RE
 	USART1_CR1 |= 1 << 3;  // 使能发送TE
@@ -273,6 +281,17 @@ void UART1_send(unsigned char *data)
 	while (!(USART1_SR & (1 << 6)))
 		; // 等待TC标志位为1
 }
+void USART1_DMA_send(unsigned char *buffer, unsigned short length)
+{
+	while (DMA1_CCR4 & 1)
+	{
+		// Wait if DMA1 Channel 4 is enabled
+	}					 // 先确定关闭通道
+	DMA1_CMAR4 = buffer; // 内存地址映射
+	DMA1_CNDTR4 = length;
+	DMA1_CCR4 |= 1; // 开启通道
+}
+
 // void UART1_receive(unsigned char *data)
 // {
 // 	while (!(USART1_SR & (1 << 5)))
@@ -300,8 +319,20 @@ unsigned char is_button_pressed(void)
 // 中断处理函数
 //
 void USART1_IRQHandler(void)
+
 {
 	buff = USART1_DR;
 	UART1_send(&buff);
 	GPIO_toggle13();
+}
+// DMA传输完成中断服务程序
+void DMA1_Channel4_IRQHandler(void)
+{
+	if (DMA1_ISR & (1 << 13))
+	{
+		// 清除传输完成中断标志
+		DMA1_IFCR |= (1 << 13);
+		// 关闭DMA通道
+		DMA1_CCR4 &= ~1;
+	}
 }
