@@ -291,9 +291,9 @@ void delay_ms(unsigned int ms)
 }
 void USART1_DMA_send(unsigned char *buffer, unsigned short length)
 {
-	// while (DMA1_CCR4 & 1)
-	// {
-	// } // 先确定关闭通道
+	while (DMA1_CCR4 & 1)
+	{
+	} // 先确定关闭通道
 	DMA1_CMAR4 = buffer;
 	DMA1_CNDTR4 = length;
 	DMA1_CCR4 |= 1; // 开启通道
