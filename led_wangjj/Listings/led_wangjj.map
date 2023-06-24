@@ -12,6 +12,7 @@ Section Cross References
     main.o(.text.system_init) refers to main.o(.text.__NVIC_EnableIRQ) for __NVIC_EnableIRQ
     main.o(.text.system_init) refers to main.o(.text.__NVIC_SetPriority) for __NVIC_SetPriority
     main.o(.ARM.exidx.text.system_init) refers to main.o(.text.system_init) for [Anonymous Symbol]
+    main.o(.text.USART1_DMA_send) refers to main.o(.text.delay_ms) for delay_ms
     main.o(.ARM.exidx.text.USART1_DMA_send) refers to main.o(.text.USART1_DMA_send) for [Anonymous Symbol]
     main.o(.ARM.exidx.text.delay_ms) refers to main.o(.text.delay_ms) for [Anonymous Symbol]
     main.o(.ARM.exidx.text.__NVIC_EnableIRQ) refers to main.o(.text.__NVIC_EnableIRQ) for [Anonymous Symbol]
@@ -308,14 +309,14 @@ Image Symbol Table
     [Anonymous Symbol]                       0x08000298   Section        0  system_stm32f10x.o(.text.SetSysClockTo72)
     [Anonymous Symbol]                       0x080003bc   Section        0  system_stm32f10x.o(.text.SystemInit)
     [Anonymous Symbol]                       0x08000424   Section        0  main.o(.text.USART1_DMA_send)
-    [Anonymous Symbol]                       0x08000454   Section        0  main.o(.text.USART1_IRQHandler)
-    __NVIC_EnableIRQ                         0x08000471   Thumb Code    48  main.o(.text.__NVIC_EnableIRQ)
-    [Anonymous Symbol]                       0x08000470   Section        0  main.o(.text.__NVIC_EnableIRQ)
-    __NVIC_SetPriority                       0x080004a1   Thumb Code    66  main.o(.text.__NVIC_SetPriority)
-    [Anonymous Symbol]                       0x080004a0   Section        0  main.o(.text.__NVIC_SetPriority)
-    [Anonymous Symbol]                       0x080004e4   Section        0  main.o(.text.delay_ms)
-    [Anonymous Symbol]                       0x0800054c   Section        0  main.o(.text.main)
-    [Anonymous Symbol]                       0x08000574   Section        0  main.o(.text.system_init)
+    [Anonymous Symbol]                       0x08000488   Section        0  main.o(.text.USART1_IRQHandler)
+    __NVIC_EnableIRQ                         0x080004a5   Thumb Code    48  main.o(.text.__NVIC_EnableIRQ)
+    [Anonymous Symbol]                       0x080004a4   Section        0  main.o(.text.__NVIC_EnableIRQ)
+    __NVIC_SetPriority                       0x080004d5   Thumb Code    66  main.o(.text.__NVIC_SetPriority)
+    [Anonymous Symbol]                       0x080004d4   Section        0  main.o(.text.__NVIC_SetPriority)
+    [Anonymous Symbol]                       0x08000518   Section        0  main.o(.text.delay_ms)
+    [Anonymous Symbol]                       0x08000580   Section        0  main.o(.text.main)
+    [Anonymous Symbol]                       0x080005a8   Section        0  main.o(.text.system_init)
     .bss                                     0x20000010   Section       96  libspace.o(.bss)
     Heap_Mem                                 0x20000078   Data         512  startup_stm32f10x_md.o(HEAP)
     HEAP                                     0x20000078   Section      512  startup_stm32f10x_md.o(HEAP)
@@ -475,13 +476,13 @@ Image Symbol Table
     DMA1_Channel4_IRQHandler                 0x08000245   Thumb Code    56  main.o(.text.DMA1_Channel4_IRQHandler)
     GPIO_toggle13                            0x0800027d   Thumb Code    18  main.o(.text.GPIO_toggle13)
     SystemInit                               0x080003bd   Thumb Code   102  system_stm32f10x.o(.text.SystemInit)
-    USART1_DMA_send                          0x08000425   Thumb Code    48  main.o(.text.USART1_DMA_send)
-    USART1_IRQHandler                        0x08000455   Thumb Code    28  main.o(.text.USART1_IRQHandler)
-    delay_ms                                 0x080004e5   Thumb Code   102  main.o(.text.delay_ms)
-    main                                     0x0800054d   Thumb Code    38  main.o(.text.main)
-    system_init                              0x08000575   Thumb Code   464  main.o(.text.system_init)
-    Region$$Table$$Base                      0x08000744   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08000764   Number         0  anon$$obj.o(Region$$Table)
+    USART1_DMA_send                          0x08000425   Thumb Code    98  main.o(.text.USART1_DMA_send)
+    USART1_IRQHandler                        0x08000489   Thumb Code    28  main.o(.text.USART1_IRQHandler)
+    delay_ms                                 0x08000519   Thumb Code   102  main.o(.text.delay_ms)
+    main                                     0x08000581   Thumb Code    38  main.o(.text.main)
+    system_init                              0x080005a9   Thumb Code   464  main.o(.text.system_init)
+    Region$$Table$$Base                      0x08000778   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08000798   Number         0  anon$$obj.o(Region$$Table)
     buff_uart1_send                          0x20000000   Data          13  main.o(.data.buff_uart1_send)
     __libspace_start                         0x20000010   Data          96  libspace.o(.bss)
     __temporary_stack_top$libspace           0x20000070   Data           0  libspace.o(.bss)
@@ -495,9 +496,9 @@ Memory Map of the image
 
   Image Entry point : 0x080000ed
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00000778, Max: 0x00010000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x000007a8, Max: 0x00010000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00000764, Max: 0x00010000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00000798, Max: 0x00010000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -567,28 +568,29 @@ Memory Map of the image
     0x080003ba   0x080003ba   0x00000002   PAD
     0x080003bc   0x080003bc   0x00000066   Code   RO           43    .text.SystemInit    system_stm32f10x.o
     0x08000422   0x08000422   0x00000002   PAD
-    0x08000424   0x08000424   0x00000030   Code   RO            6    .text.USART1_DMA_send  main.o
-    0x08000454   0x08000454   0x0000001c   Code   RO           18    .text.USART1_IRQHandler  main.o
-    0x08000470   0x08000470   0x00000030   Code   RO           10    .text.__NVIC_EnableIRQ  main.o
-    0x080004a0   0x080004a0   0x00000042   Code   RO           12    .text.__NVIC_SetPriority  main.o
-    0x080004e2   0x080004e2   0x00000002   PAD
-    0x080004e4   0x080004e4   0x00000066   Code   RO            8    .text.delay_ms      main.o
-    0x0800054a   0x0800054a   0x00000002   PAD
-    0x0800054c   0x0800054c   0x00000026   Code   RO            2    .text.main          main.o
-    0x08000572   0x08000572   0x00000002   PAD
-    0x08000574   0x08000574   0x000001d0   Code   RO            4    .text.system_init   main.o
-    0x08000744   0x08000744   0x00000020   Data   RO          225    Region$$Table       anon$$obj.o
+    0x08000424   0x08000424   0x00000062   Code   RO            6    .text.USART1_DMA_send  main.o
+    0x08000486   0x08000486   0x00000002   PAD
+    0x08000488   0x08000488   0x0000001c   Code   RO           18    .text.USART1_IRQHandler  main.o
+    0x080004a4   0x080004a4   0x00000030   Code   RO           10    .text.__NVIC_EnableIRQ  main.o
+    0x080004d4   0x080004d4   0x00000042   Code   RO           12    .text.__NVIC_SetPriority  main.o
+    0x08000516   0x08000516   0x00000002   PAD
+    0x08000518   0x08000518   0x00000066   Code   RO            8    .text.delay_ms      main.o
+    0x0800057e   0x0800057e   0x00000002   PAD
+    0x08000580   0x08000580   0x00000026   Code   RO            2    .text.main          main.o
+    0x080005a6   0x080005a6   0x00000002   PAD
+    0x080005a8   0x080005a8   0x000001d0   Code   RO            4    .text.system_init   main.o
+    0x08000778   0x08000778   0x00000020   Data   RO          225    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08000768, Size: 0x00000678, Max: 0x00005000, ABSOLUTE)
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08000798, Size: 0x00000678, Max: 0x00005000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x08000768   0x0000000d   Data   RW           23    .data.buff_uart1_send  main.o
-    0x2000000d   0x08000775   0x00000003   PAD
+    0x20000000   0x08000798   0x0000000d   Data   RW           23    .data.buff_uart1_send  main.o
+    0x2000000d   0x080007a5   0x00000003   PAD
     0x20000010        -       0x00000060   Zero   RW           92    .bss                c_w.l(libspace.o)
     0x20000070        -       0x00000001   Zero   RW           22    .bss.buff           main.o
-    0x20000071   0x08000775   0x00000007   PAD
+    0x20000071   0x080007a5   0x00000007   PAD
     0x20000078        -       0x00000200   Zero   RW           34    HEAP                startup_stm32f10x_md.o
     0x20000278        -       0x00000400   Zero   RW           33    STACK               startup_stm32f10x_md.o
 
@@ -600,14 +602,14 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       868          0          0         13          1       4421   main.o
+       918          0          0         13          1       4468   main.o
         64         26        236          0       1536        836   startup_stm32f10x_md.o
        400          0          0          0          0       2821   system_stm32f10x.o
 
     ----------------------------------------------------------------------
-      1344         26        268         16       1544       8078   Object Totals
+      1396         26        268         16       1544       8125   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-        12          0          0          3          7          0   (incl. Padding)
+        14          0          0          3          7          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -654,15 +656,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      1624         42        268         16       1640       8534   Grand Totals
-      1624         42        268         16       1640       8534   ELF Image Totals
-      1624         42        268         16          0          0   ROM Totals
+      1676         42        268         16       1640       8581   Grand Totals
+      1676         42        268         16       1640       8581   ELF Image Totals
+      1676         42        268         16          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 1892 (   1.85kB)
+    Total RO  Size (Code + RO Data)                 1944 (   1.90kB)
     Total RW  Size (RW Data + ZI Data)              1656 (   1.62kB)
-    Total ROM Size (Code + RO Data + RW Data)       1908 (   1.86kB)
+    Total ROM Size (Code + RO Data + RW Data)       1960 (   1.91kB)
 
 ==============================================================================
 

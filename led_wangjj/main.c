@@ -296,7 +296,11 @@ void USART1_DMA_send(unsigned char *buffer, unsigned short length)
 	} // 先确定关闭通道
 	DMA1_CMAR4 = buffer;
 	DMA1_CNDTR4 = length;
+	delay_ms(3000);
 	DMA1_CCR4 |= 1; // 开启通道
+	while (!(USART1_SR&(1<<6)))
+	{
+	} // 等待TC
 }
 
 unsigned char is_button_pressed(void)
