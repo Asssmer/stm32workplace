@@ -38,18 +38,18 @@ typedef unsigned long long uint64_t;
 #define GPIOA_BASE 0x40010800
 #define GPIOA_CRL *((volatile unsigned int *)(GPIOA_BASE + 0x00))
 #define GPIOA_CRH *((volatile unsigned int *)(GPIOA_BASE + 0x04))
-#define GPIOA_IDR *((volatile unsigned short *)(GPIOA_BASE + 0x08))
+#define GPIOA_IDR *((volatile uint16_t *)(GPIOA_BASE + 0x08))
 #define GPIOA_ODR *((volatile unsigned int *)(GPIOA_BASE + 0x0C))
 #define GPIOA_BSRR *((volatile unsigned int *)(GPIOA_BASE + 0x10))
 #define GPIOA_BRR *((volatile unsigned int *)(GPIOA_BASE + 0x14))
 #define GPIOA_LCKR *((volatile unsigned int *)(GPIOA_BASE + 0x18))
 
 #define TIM2_BASE 0x40000000
-#define TIM2_CR1 *((volatile unsigned short *)(TIM2_BASE + 0x00))
-#define TIM2_PSC *((volatile unsigned short *)(TIM2_BASE + 0x28))
-#define TIM2_ARR *((volatile unsigned short *)(TIM2_BASE + 0x2C))
-#define TIM2_SR *((volatile unsigned short *)(TIM2_BASE + 0x10))
-#define TIM2_CNT *((volatile unsigned short *)(TIM2_BASE + 0x24))
+#define TIM2_CR1 *((volatile uint16_t *)(TIM2_BASE + 0x00))
+#define TIM2_PSC *((volatile uint16_t *)(TIM2_BASE + 0x28))
+#define TIM2_ARR *((volatile uint16_t *)(TIM2_BASE + 0x2C))
+#define TIM2_SR *((volatile uint16_t *)(TIM2_BASE + 0x10))
+#define TIM2_CNT *((volatile uint16_t *)(TIM2_BASE + 0x24))
 
 #define USART1 0x40013800
 #define USART1_SR *((volatile unsigned int *)(USART1 + 0x00))
@@ -182,15 +182,7 @@ uint8_t buff_uart1_receive[256];
 
 int main(void)
 {
-    system_init();
-    NVIC_init();
-    USART1_init();
-    GPIO_init();
-    while (1)
-    {
-        USART1_DMA_send(&buff_uart1_send[0], sizeof(buff_uart1_send));
-        delay_ms(1000);
-    }
+
 }
 //
 // º¯Êý¶¨Òå
