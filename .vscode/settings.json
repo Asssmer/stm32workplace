@@ -23,6 +23,7 @@
         "xutility": "c",
         "algorithm": "c",
         "xmemory": "c",
-        "stm32f10x.h": "c"
+        "stm32f10x.h": "c",
+        "cstring": "c"
     }
 }

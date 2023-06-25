@@ -190,7 +190,7 @@ int main(void)
 	while (1)
 	{
 		USART1_DMA_send(&buff_uart1_send[0], sizeof(buff_uart1_send));
-		delay_ms(2000);
+		delay_ms(1000);
 		// USART1_DMA_send(&buff_uart1_send[0], sizeof(buff_uart1_send));
 		// delay_ms(1000);
 	}
@@ -257,8 +257,8 @@ void system_init(void)
 	DMA1_CCR4 &= ~(0b00 << 8);	// 外设数据宽度8
 	DMA1_CCR4 &= ~(0b00 << 10); // 存储器数据宽度8
 	DMA1_CCR4 |= 0b10 << 12;	// 通道优先级
-	DMA1_CPAR4 = &USART1_DR;	// 设置外设寄存器地址
-	USART1_CR3 |= 1 << 7;		// 使能串口1的发送DMA
+	
+	
 
 	// USART1
 	GPIOA_CRH &= ~(0xFF << 4);	  // 清除PA9,PA10控制位
@@ -291,16 +291,18 @@ void delay_ms(unsigned int ms)
 }
 void USART1_DMA_send(unsigned char *buffer, unsigned short length)
 {
-	while (DMA1_CCR4 & 1)
+		while (DMA1_CCR4 & 1)
 	{
 	} // 先确定关闭通道
 	DMA1_CMAR4 = buffer;
 	DMA1_CNDTR4 = length;
-	delay_ms(3000);
+	DMA1_CPAR4 = &USART1_DR;	// 设置外设寄存器地址
+	USART1_CR3 |= 1 << 7;		// 使能串口1的发送DMA
 	DMA1_CCR4 |= 1; // 开启通道
 	while (!(USART1_SR&(1<<6)))
 	{
 	} // 等待TC
+
 }
 
 unsigned char is_button_pressed(void)
