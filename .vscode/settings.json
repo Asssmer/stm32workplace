@@ -25,6 +25,8 @@
         "xmemory": "c",
         "stm32f10x.h": "c",
         "cstring": "c",
-        "initializer_list": "c"
+        "initializer_list": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c"
     }
 }

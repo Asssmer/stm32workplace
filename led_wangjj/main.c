@@ -1,5 +1,7 @@
 #define STM32F10X_MD
 #include "stm32f10x.h"
+// #include "stdlib.h"
+// #include "stdio.h"
 
 #ifndef int8_t
 typedef signed char int8_t;
@@ -170,7 +172,8 @@ void DMA1_init(void);
 void TIM2_init(void);
 void USART1_init(void);
 void USART1_DMA_send(uint8_t *buffer, uint16_t length);
-void log(uint8_t *string);
+int log(uint8_t *string);
+void intToStr(int num, char *str, uint16_t size);
 
 void USART1_DMA_receive(uint8_t *buffer, uint16_t length);
 
@@ -193,8 +196,6 @@ int main(void)
     while (1)
     {
         delay_ms(1000);
-        // USART1_DMA_send("hello wo\n", sizeof("hello wo\n"));
-        log("hello\n");
     }
 }
 //
@@ -346,15 +347,58 @@ void USART1_DMA_receive(uint8_t *buffer, uint16_t length)
 {
 }
 
-void log(uint8_t *string)
+int log(uint8_t *string)
 {
     uint8_t *start = string;
     uint16_t count_size = 0;
     while (*string++)
     {
         count_size++;
+        if (count_size > 50)
+        {
+            log("string is too long!");
+            return -1;
+        }
     }
     USART1_DMA_send(start, count_size);
+}
+void intToStr(int num, char *str, uint16_t size)
+{
+    char *start = str;
+    if (size == 0) // 检查输入的缓冲区大小是否为0
+    {
+        return;
+    }
+    if (num < 0) // 处理负整数的情况
+    {
+        if (size == 1) // 确保缓冲区大小足够存放负号
+        {
+            *str = '\0';
+            return;
+        }
+        *str++ = '-';
+        size--;
+        num = -num;
+    }
+    if (num / 10 != 0) // 递归转换数字为字符串
+    {
+        intToStr(num / 10, str, size);
+    }
+    if (strlen(str) + 2 <= size) // 确保缓冲区大小足够存放当前数字字符和末尾的'\0'
+    {
+        str[strlen(str)] = num % 10 + '0';
+    }
+    else
+    {
+        if (start != str) // 如果缓冲区不够大，就把字符串提前结束
+        {
+            *(str - 1) = '\0';
+        }
+        else
+        {
+            *str = '\0';
+        }
+    }
 }
 
 //

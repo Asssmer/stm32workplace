@@ -170,7 +170,10 @@ void DMA1_init(void);
 void TIM2_init(void);
 void USART1_init(void);
 void USART1_DMA_send(uint8_t *buffer, uint16_t length);
+
 void log(uint8_t *string);
+void intToStr(int num, char* str, uint16_t size);
+
 void USART1_DMA_receive(uint8_t *buffer, uint16_t length);
 
 void delay_ms(uint32_t ms);
@@ -343,6 +346,39 @@ void log(uint8_t *string)
         count_size++;
     }
     USART1_DMA_send(start, count_size);
+}
+void intToStr(int num, char* str, uint16_t size) {
+    char* start = str;
+    // 检查输入的缓冲区大小是否为0
+    if(size == 0) {
+        return;
+    }
+    // 处理负整数的情况
+    if(num < 0) {
+        // 确保缓冲区大小足够存放负号
+        if(size == 1) {
+            *str = '\0';
+            return;
+        }
+        *str++ = '-';
+        size--;
+        num = -num;
+    }
+    // 递归转换数字为字符串
+    if(num / 10 != 0) {
+        intToStr(num / 10, str, size);
+    }
+    // 确保缓冲区大小足够存放当前数字字符和末尾的'\0'
+    if(strlen(str) + 2 <= size) {
+        str[strlen(str)] = num % 10 + '0';
+    } else {
+        // 如果缓冲区不够大，就把字符串提前结束
+        if(start != str) {
+            *(str - 1) = '\0';
+        } else {
+            *str = '\0';
+        }
+    }
 }
 
 //
