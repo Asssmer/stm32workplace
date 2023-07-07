@@ -38,18 +38,18 @@ typedef unsigned long long uint64_t;
 #define GPIOA_BASE 0x40010800
 #define GPIOA_CRL *((volatile unsigned int *)(GPIOA_BASE + 0x00))
 #define GPIOA_CRH *((volatile unsigned int *)(GPIOA_BASE + 0x04))
-#define GPIOA_IDR *((volatile unsigned short *)(GPIOA_BASE + 0x08))
+#define GPIOA_IDR *((volatile uint16_t *)(GPIOA_BASE + 0x08))
 #define GPIOA_ODR *((volatile unsigned int *)(GPIOA_BASE + 0x0C))
 #define GPIOA_BSRR *((volatile unsigned int *)(GPIOA_BASE + 0x10))
 #define GPIOA_BRR *((volatile unsigned int *)(GPIOA_BASE + 0x14))
 #define GPIOA_LCKR *((volatile unsigned int *)(GPIOA_BASE + 0x18))
 
 #define TIM2_BASE 0x40000000
-#define TIM2_CR1 *((volatile unsigned short *)(TIM2_BASE + 0x00))
-#define TIM2_PSC *((volatile unsigned short *)(TIM2_BASE + 0x28))
-#define TIM2_ARR *((volatile unsigned short *)(TIM2_BASE + 0x2C))
-#define TIM2_SR *((volatile unsigned short *)(TIM2_BASE + 0x10))
-#define TIM2_CNT *((volatile unsigned short *)(TIM2_BASE + 0x24))
+#define TIM2_CR1 *((volatile uint16_t *)(TIM2_BASE + 0x00))
+#define TIM2_PSC *((volatile uint16_t *)(TIM2_BASE + 0x28))
+#define TIM2_ARR *((volatile uint16_t *)(TIM2_BASE + 0x2C))
+#define TIM2_SR *((volatile uint16_t *)(TIM2_BASE + 0x10))
+#define TIM2_CNT *((volatile uint16_t *)(TIM2_BASE + 0x24))
 
 #define USART1 0x40013800
 #define USART1_SR *((volatile unsigned int *)(USART1 + 0x00))
@@ -170,6 +170,8 @@ void DMA1_init(void);
 void TIM2_init(void);
 void USART1_init(void);
 void USART1_DMA_send(uint8_t *buffer, uint16_t length);
+void log(uint8_t *string);
+
 void USART1_DMA_receive(uint8_t *buffer, uint16_t length);
 
 void delay_ms(uint32_t ms);
@@ -185,13 +187,14 @@ int main(void)
     system_init();
     NVIC_init();
     GPIO_init();
-	TIM2_init();
+    DMA1_init();
+    TIM2_init();
     USART1_init();
-	DMA1_init();
     while (1)
     {
-        USART1_DMA_send(&buff_uart1_send[0], sizeof(buff_uart1_send));
         delay_ms(1000);
+        // USART1_DMA_send("hello wo\n", sizeof("hello wo\n"));
+        log("hello\n");
     }
 }
 //
@@ -323,11 +326,14 @@ void USART1_init(void)
 
 void USART1_DMA_send(uint8_t *buffer, uint16_t length)
 {
-    // while (DMA1_CCR4 & 1)
-    // {
-    // } // 先确定关闭通道
+    while (DMA1_CCR4 & 1)
+    {
+    } // 先确定关闭通道
     DMA1_CMAR4 = buffer;
     DMA1_CNDTR4 = length;
+    while (!(USART1_SR & (1 << 7)))
+    {
+    }                        // 等待TXE
     DMA1_CPAR4 = &USART1_DR; // 设置外设寄存器地址
     USART1_CR3 |= 1 << 7;    // 使能串口1的发送DMA
     DMA1_CCR4 |= 1;          // 开启通道
@@ -340,20 +346,30 @@ void USART1_DMA_receive(uint8_t *buffer, uint16_t length)
 {
 }
 
+void log(uint8_t *string)
+{
+    uint8_t *start = string;
+    uint16_t count_size = 0;
+    while (*string++)
+    {
+        count_size++;
+    }
+    USART1_DMA_send(start, count_size);
+}
+
 //
 // 中断处理函数
 //
 void USART1_IRQHandler(void)
 {
-    buff = USART1_DR;
     GPIO_toggle13();
+    USART1_SR &= ~(1 << 5); // 清除中断标志位
 }
 
 void DMA1_Channel4_IRQHandler(void)
 {
     while (DMA1_ISR & (1 << 13))
     {
-        GPIO_toggle13();
         DMA1_IFCR |= (1 << 13); // 清除传输完成中断标志
         DMA1_CCR4 &= ~1;        // 关闭DMA通道
     }

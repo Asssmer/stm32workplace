@@ -170,6 +170,7 @@ void DMA1_init(void);
 void TIM2_init(void);
 void USART1_init(void);
 void USART1_DMA_send(uint8_t *buffer, uint16_t length);
+void log(uint8_t *string);
 void USART1_DMA_receive(uint8_t *buffer, uint16_t length);
 
 void delay_ms(uint32_t ms);
@@ -182,7 +183,6 @@ uint8_t buff_uart1_receive[256];
 
 int main(void)
 {
-
 }
 //
 // 函数定义
@@ -313,11 +313,14 @@ void USART1_init(void)
 
 void USART1_DMA_send(uint8_t *buffer, uint16_t length)
 {
-    // while (DMA1_CCR4 & 1)
-    // {
-    // } // 先确定关闭通道
+    while (DMA1_CCR4 & 1)
+    {
+    } // 先确定关闭通道
     DMA1_CMAR4 = buffer;
     DMA1_CNDTR4 = length;
+    while (!(USART1_SR & (1 << 7)))
+    {
+    }                        // 等待TXE
     DMA1_CPAR4 = &USART1_DR; // 设置外设寄存器地址
     USART1_CR3 |= 1 << 7;    // 使能串口1的发送DMA
     DMA1_CCR4 |= 1;          // 开启通道
@@ -328,6 +331,18 @@ void USART1_DMA_send(uint8_t *buffer, uint16_t length)
 
 void USART1_DMA_receive(uint8_t *buffer, uint16_t length)
 {
+    GPIO_toggle13();
+    USART1_SR &= ~(1 << 5); // 清除中断标志位
+}
+void log(uint8_t *string)
+{
+    uint8_t *start = string;
+    uint16_t count_size = 0;
+    while (*string++)
+    {
+        count_size++;
+    }
+    USART1_DMA_send(start, count_size);
 }
 
 //

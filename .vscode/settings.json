@@ -24,6 +24,7 @@
         "algorithm": "c",
         "xmemory": "c",
         "stm32f10x.h": "c",
-        "cstring": "c"
+        "cstring": "c",
+        "initializer_list": "c"
     }
 }
