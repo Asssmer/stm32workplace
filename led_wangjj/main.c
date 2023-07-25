@@ -31,11 +31,20 @@ typedef unsigned long long uint64_t;
 
 #define GPIOC_CRL *((volatile unsigned int *)(GPIOC_BASE + 0x00))
 #define GPIOC_CRH *((volatile unsigned int *)(GPIOC_BASE + 0x04))
-#define GPIOC_IDR *((volatile unsigned int *)(GPIOC_BASE + 0x08))
+#define GPIOC_IDR *((volatile uint16_t *)(GPIOC_BASE + 0x08))
 #define GPIOC_ODR *((volatile unsigned int *)(GPIOC_BASE + 0x0C))
 #define GPIOC_BSRR *((volatile unsigned int *)(GPIOC_BASE + 0x10))
 #define GPIOC_BRR *((volatile unsigned int *)(GPIOC_BASE + 0x14))
 #define GPIOC_LCKR *((volatile unsigned int *)(GPIOC_BASE + 0x18))
+
+#define GPIOB_BASE 0x40010C00
+#define GPIOB_CRL *((volatile unsigned int *)(GPIOB_BASE + 0x00))
+#define GPIOB_CRH *((volatile unsigned int *)(GPIOB_BASE + 0x04))
+#define GPIOB_IDR *((volatile uint16_t *)(GPIOB_BASE + 0x08))
+#define GPIOB_ODR *((volatile unsigned int *)(GPIOB_BASE + 0x0C))
+#define GPIOB_BSRR *((volatile unsigned int *)(GPIOB_BASE + 0x10))
+#define GPIOB_BRR *((volatile unsigned int *)(GPIOB_BASE + 0x14))
+#define GPIOB_LCKR *((volatile unsigned int *)(GPIOB_BASE + 0x18))
 
 #define GPIOA_BASE 0x40010800
 #define GPIOA_CRL *((volatile unsigned int *)(GPIOA_BASE + 0x00))
@@ -45,6 +54,16 @@ typedef unsigned long long uint64_t;
 #define GPIOA_BSRR *((volatile unsigned int *)(GPIOA_BASE + 0x10))
 #define GPIOA_BRR *((volatile unsigned int *)(GPIOA_BASE + 0x14))
 #define GPIOA_LCKR *((volatile unsigned int *)(GPIOA_BASE + 0x18))
+
+#define AFIO_BASE 0x40010000
+
+#define AFIO_EVCR *((volatile unsigned int *)(AFIO_BASE + 0x00))
+#define AFIO_MAPR *((volatile unsigned int *)(AFIO_BASE + 0x04))
+#define AFIO_EXTICR1 *((volatile unsigned int *)(AFIO_BASE + 0x08))
+#define AFIO_EXTICR2 *((volatile unsigned int *)(AFIO_BASE + 0x0C))
+#define AFIO_EXTICR3 *((volatile unsigned int *)(AFIO_BASE + 0x10))
+#define AFIO_EXTICR4 *((volatile unsigned int *)(AFIO_BASE + 0x14))
+#define AFIO_MAPR2 *((volatile unsigned int *)(AFIO_BASE + 0x1C))
 
 #define TIM2_BASE 0x40000000
 #define TIM2_CR1 *((volatile uint16_t *)(TIM2_BASE + 0x00))
@@ -82,6 +101,16 @@ typedef unsigned long long uint64_t;
 #define NVIC_IPR0 *((volatile unsigned int *)(NVIC_BASE + 0x300 + (0 * 4)))
 #define NVIC_IPR3 *((volatile unsigned int *)(NVIC_BASE + 0x300 + (3 * 4)))
 #define NVIC_IPR9 *((volatile unsigned int *)(NVIC_BASE + 0x300 + (9 * 4)))
+
+// EXTI
+#define EXTI_BASE 0x40010400
+
+#define EXTI_IMR *((volatile unsigned int *)(EXTI_BASE + 0x00))
+#define EXTI_EMR *((volatile unsigned int *)(EXTI_BASE + 0x04))
+#define EXTI_RTSR *((volatile unsigned int *)(EXTI_BASE + 0x08))
+#define EXTI_FTSR *((volatile unsigned int *)(EXTI_BASE + 0x0C))
+#define EXTI_SWIER *((volatile unsigned int *)(EXTI_BASE + 0x10))
+#define EXTI_PR *((volatile unsigned int *)(EXTI_BASE + 0x14))
 
 // DMA1 Base Address
 #define DMA1_BASE 0x40020000
@@ -177,9 +206,11 @@ void intToStr(int num, char *str, uint16_t size);
 
 void USART1_DMA_receive(uint8_t *buffer, uint16_t length);
 
-void delay_ms(uint32_t ms);
+void delay_ms(uint16_t ms);
+void delay_us(uint16_t us);
 void GPIO_toggle13(void);
 unsigned char is_button_pressed(void);
+void DHT11_init(void);
 
 uint8_t buff = '\0';
 uint8_t buff_uart1_send[] = "hello world\n";
@@ -193,9 +224,10 @@ int main(void)
     DMA1_init();
     TIM2_init();
     USART1_init();
+    DHT11_init();
+    log("START!");
     while (1)
     {
-        delay_ms(1000);
     }
 }
 //
@@ -205,17 +237,31 @@ void GPIO_toggle13(void)
 {
     GPIOC_ODR ^= 1 << 13;
 }
-void delay_ms(unsigned int ms)
-{
 
-    TIM2_PSC = 7200 - 1; // 使用7200-1的预分频值，使得每个计数周期为0.1ms
-    TIM2_ARR = ms * 10;  // 设置自动重载值为所需的延迟毫秒数
-    TIM2_CNT = 0;        // 清零CNT寄存器
-    TIM2_CR1 |= 1;       // 开启定时器
+void delay_ms(uint16_t ms)
+{
+    TIM2_PSC = 7200 - 1;      // 使用7200-1的预分频值，使得每个计数周期为0.1ms
+    TIM2_ARR = (ms - 1) * 10; // 设置自动重载值为所需的延迟毫秒数
+    TIM2_CNT = 0;             // 清零CNT寄存器
+    TIM2_CR1 |= 1;            // 开启定时器
     while (!(TIM2_SR & 1))
     {
     }               // 等待更新事件标志位
-    TIM2_SR &= ~1;  // 清除更新事件标志位
+    TIM2_SR = 0;    // 清除更新事件标志位
+    TIM2_CR1 &= ~1; // 关闭定时器
+}
+
+void delay_us(uint16_t us)
+{
+
+    TIM2_PSC = 72 - 1; // 使用72-1的预分频值，使得每个计数周期为1us
+    TIM2_ARR = us - 1; // 设置自动重载值为所需的延迟微秒数
+    TIM2_CNT = 0;      // 清零CNT寄存器
+    TIM2_CR1 |= 1;     // 开启定时器
+    while (!(TIM2_SR & 1))
+    {
+    }               // 等待更新事件标志位
+    TIM2_SR = 0;    // 清除更新事件标志位
     TIM2_CR1 &= ~1; // 关闭定时器
 }
 
@@ -240,27 +286,47 @@ unsigned char is_button_pressed(void)
 void system_init(void)
 {
     // RCC配置
-    RCC_CR |= (1 << 0); // 开启HSI
-    while (!(RCC_CR & (1 << 1)))
-    {
-    }; // 等待HSI准备好
 
-    RCC_CFGR |= (int)1 << 16; // 设置为PLL输入
-    RCC_CFGR |= 0b0111 << 18; // 分频9倍,达到72Mhz
+    RCC_CR |= (1 << 16);          // 开启HSE
+    while (!(RCC_CR & (1 << 17))) // 等待HSE准备好
+    {
+    }
+    RCC_CFGR &= 0b00;                               // SW HSI
+    while ((RCC_CFGR & (0b11 << 2)) != (0b00 << 2)) // 等待HSI时钟被选为系统时钟
+    {
+    }
+    RCC_CR &= ~(1 << 24);      // 关闭PLL
+    while (RCC_CR & (1 << 25)) // 等待PLL关闭
+    {
+    }
+    RCC_CFGR &=~(1<< 17);  // 配置PLLXTPRE
+    RCC_CFGR |= 1 << 16; // 设置为PLL输入为HSE
+    RCC_CFGR &= ~(0b1111 << 18); // 清除为0
+    RCC_CFGR |= 0b0100 << 18; // 分频6倍,达到48Mhz
+    // RCC_CFGR |= 0b0111 << 18; // 分频9倍,达到72Mhz
     RCC_CFGR |= 0b0100 << 8;  // 分频2倍,APB1降低为36Mhz
-    RCC_CR |= (int)1 << 24;   // 使能PLL,等待ready
-    while (!RCC_CR & ((int)1 << 25))
+    RCC_CFGR &= ~(0b100 << 24); // 清空MCO输出
+    RCC_CFGR |= 0b100 << 24; // MCO输出系统时钟
+    RCC_CR |= 1 << 24; // 使能PLL,等待ready
+    while (!RCC_CR & (1 << 25))
+    {
+    }
+    RCC_CFGR |= 0b10;                               // SW PLL
+    while ((RCC_CFGR & (0b11 << 2)) != (0b10 << 2)) // 等待PLL时钟被选为系统时钟
     {
     }
 }
 
 void NVIC_init(void)
 {
-    NVIC_EnableIRQ(USART1_IRQn);       // 使能USART1全局中断
     NVIC_SetPriority(USART1_IRQn, 10); // USART1优先级10
+    NVIC_EnableIRQ(USART1_IRQn);       // 使能USART1全局中断
 
+    NVIC_SetPriority(DMA1_Channel4_IRQn, 11); // DMA14优先级10
     NVIC_EnableIRQ(DMA1_Channel4_IRQn);       // 使能DMA14全局中断
-    NVIC_SetPriority(DMA1_Channel4_IRQn, 10); // DMA14优先级10
+
+    NVIC_SetPriority(EXTI15_10_IRQn, 12); // 中断优先级
+    NVIC_EnableIRQ(EXTI15_10_IRQn);       // 使能EXTI0
 
     /*
     void __disable_irq(void) // Disable Interrupts
@@ -277,19 +343,38 @@ void NVIC_init(void)
     uint32_t NVIC_GetPriority (IRQn_t IRQn)
     void NVIC_SystemReset (void)
     */
+
+    // EXTI
+    // 配置EXTI线路和触发方式
+    EXTI_IMR |= 1 << 15;
+    EXTI_RTSR |= 1 << 15; // 上升沿触发中断
+    EXTI_FTSR |= 1 << 15; // 下降沿触发中断
 }
 
 void GPIO_init(void)
 {
+    // 使能时钟
+    RCC_APB2ENR |= 1 << 2; // 使能GPIOA时钟GPIOAAAAAAAAAAAAAAAAAAAA
+    RCC_APB2ENR |= 1 << 3; // 使能GPIOA时钟GPIOBBBBBBBBBBBBBBBBBBBB
+    RCC_APB2ENR |= 1 << 4; // 使能PORTC时钟GPIOCCCCCCCCCCCCCCCCCCCC
+    RCC_APB2ENR |= 1;      // 使能AFIOEN(Alternate function I/O clock enable)
+
+    // MCO--PA8
+    GPIOA_CRH &= ~(0b1111); // 清除PA8控制位
+    GPIOA_CRH |= 0b1011;    // 设置PA8为复用推挽输出
+
     // LED灯
-    RCC_APB2ENR |= 1 << 4;                 // 使能PORTC时钟
-    GPIOC_CRH &= ~(0xF << ((13 - 8) * 4)); // 清除控制位
-    GPIOC_CRH |= 0b0011 << ((13 - 8) * 4); // 设置PC13为推挽输出
+    GPIOC_CRH &= ~(0xF << 20); // 清除控制位
+    GPIOC_CRH |= 0b0011 << 20; // 设置PC13为推挽输出
     // 按键
-    RCC_APB2ENR |= 1 << 14;      // 使能GPIOA时钟
     GPIOA_CRL &= ~(0b1111 << 4); // 清除PA1控制位
     GPIOA_CRL |= 0b1000 << 4;    // 设置PA1为上拉/下拉输入
     GPIOA_ODR |= 0b1 << 1;       // 启用PA1为内部上拉电阻
+    // 上升下降沿侦测
+    GPIOA_CRH &= ~(0b1111 << 28); // 清除PA15控制位
+    GPIOA_CRH |= 0b0100 << 28;    // 设置PA15为浮空输入
+    AFIO_EXTICR4 &= 0;            // 清除映射位
+    AFIO_EXTICR4 |= 0b0000 << 12; // 设置成PA15映射
 }
 
 void DMA1_init(void)
@@ -311,8 +396,8 @@ void TIM2_init(void)
 
 void USART1_init(void)
 {
-    RCC_APB2ENR |= 1 << 14;       // 使能GPIOA时钟
-    RCC_APB2ENR |= 1 << 2;        // 使能USART1时钟
+    RCC_APB2ENR |= 1 << 14;       // 使能USART1时钟
+    RCC_APB2ENR |= 1 << 2;        // 使能GPIOA时钟
     GPIOA_CRH &= ~(0xFF << 4);    // 清除PA9,PA10控制位
     GPIOA_CRH |= 0b01001011 << 4; // 设置PA9为复用推挽输出,PA10为浮空输入
     USART1_BRR = 72000000 / 9600; // 设置波特率为9600
@@ -354,7 +439,7 @@ int log(uint8_t *string)
     while (*string++)
     {
         count_size++;
-        if (count_size > 50)
+        if (count_size > 1024)
         {
             log("string is too long!");
             return -1;
@@ -362,6 +447,7 @@ int log(uint8_t *string)
     }
     USART1_DMA_send(start, count_size);
 }
+
 void intToStr(int num, char *str, uint16_t size)
 {
     char *start = str;
@@ -401,6 +487,50 @@ void intToStr(int num, char *str, uint16_t size)
     }
 }
 
+void DHT11_init(void)
+{
+    // start!
+    GPIOB_CRL &= ~(0b1111 << 20); // 清除PB5控制位
+    GPIOB_CRL |= 0b0011 << 20;    // 设置PB5为上推挽输出
+
+    // GPIOB_BRR |= (uint16_t)1 << 5; // 拉低PB5
+    GPIOB_BSRR = (uint16_t)1 << 5; // 拉高PB5
+    // delay_ms(1000);                // 延时18ms
+    // delay_us(1000);                // 延时30us
+    // GPIOB_BRR |= (uint16_t)1 << 5; // 拉低PB5
+
+    // check response
+    // GPIOB_CRL &= ~(0b1111 << 20); // 清除PB5控制位
+    // GPIOB_CRL |= 0b0100 << 20;    // 设置PB5为上浮空输入
+
+    // if (GPIOB_IDR & ((uint16_t)1 << 5))
+    // {
+    //     log("DHT11 FAIL1\n");
+    // }
+    // else
+    // {
+    //     delay_us(80); // 等待80us
+    //     if (GPIOB_IDR & ((uint16_t)1 << 5))
+    //     {
+    //         delay_us(80); // 已经拉高,等待80us
+    //         log("DHT11 OK\n");
+    //     }
+    // }
+}
+
+//     uint8_t dht11_check_response(void) {
+
+//     if (!GPIO_ReadInputDataBit(DHT11_PORT, DHT11_PIN)) { // 如果DHT11拉低数据线
+//         delay_us(80); // 等待80us
+//         if (GPIO_ReadInputDataBit(DHT11_PORT, DHT11_PIN)) { // 如果DHT11拉高数据线
+//             delay_us(80); // 等待80us
+//             return 1; // DHT11响应成功
+//         }
+//     }
+
+//     return 0; // DHT11响应失败
+// }
+
 //
 // 中断处理函数
 //
@@ -416,5 +546,14 @@ void DMA1_Channel4_IRQHandler(void)
     {
         DMA1_IFCR |= (1 << 13); // 清除传输完成中断标志
         DMA1_CCR4 &= ~1;        // 关闭DMA通道
+    }
+}
+
+void EXTI15_10_IRQHandler(void)
+{
+    if (EXTI_PR & (1 << 15)) // 检查中断标志位是否为PA15引脚触发的中断
+    {
+        log("IN EXTI\n");
+        EXTI_PR |= 1 << 15; // 清除中断标志位
     }
 }

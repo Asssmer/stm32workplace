@@ -176,7 +176,8 @@ void intToStr(int num, char* str, uint16_t size);
 
 void USART1_DMA_receive(uint8_t *buffer, uint16_t length);
 
-void delay_ms(uint32_t ms);
+void delay_ms(uint16_t ms);
+void delay_us(uint16_tus);
 void GPIO_toggle13(void);
 unsigned char is_button_pressed(void);
 
@@ -194,11 +195,24 @@ void GPIO_toggle13(void)
 {
     GPIOC_ODR ^= 1 << 13;
 }
-void delay_ms(unsigned int ms)
+void delay_ms(uint16_t ms)
 {
-
     TIM2_PSC = 7200 - 1; // 使用7200-1的预分频值，使得每个计数周期为0.1ms
     TIM2_ARR = ms * 10;  // 设置自动重载值为所需的延迟毫秒数
+    TIM2_CNT = 0;        // 清零CNT寄存器
+    TIM2_CR1 |= 1;       // 开启定时器
+    while (!(TIM2_SR & 1))
+    {
+    }               // 等待更新事件标志位
+    TIM2_SR &= ~1;  // 清除更新事件标志位
+    TIM2_CR1 &= ~1; // 关闭定时器
+}
+
+void delay_us(uint16_t us)
+{
+
+    TIM2_PSC = 72 - 1; // 使用7200-1的预分频值，使得每个计数周期为1us
+    TIM2_ARR = us;  // 设置自动重载值为所需的延迟微秒数
     TIM2_CNT = 0;        // 清零CNT寄存器
     TIM2_CR1 |= 1;       // 开启定时器
     while (!(TIM2_SR & 1))
@@ -229,18 +243,19 @@ unsigned char is_button_pressed(void)
 void system_init(void)
 {
     // RCC配置
-    RCC_CR |= (1 << 0); // 开启HSI
-    while (!(RCC_CR & (1 << 1)))
+    RCC_CR |= (1 << 16); // 开启HSE
+    while (!(RCC_CR & (1 << 17)))
     {
-    }; // 等待HSI准备好
+    }; // 等待HSE准备好
 
-    RCC_CFGR |= (int)1 << 16; // 设置为PLL输入
+    RCC_CFGR |= (int)1 << 16; // 设置为PLL输入为HSE
     RCC_CFGR |= 0b0111 << 18; // 分频9倍,达到72Mhz
     RCC_CFGR |= 0b0100 << 8;  // 分频2倍,APB1降低为36Mhz
     RCC_CR |= (int)1 << 24;   // 使能PLL,等待ready
     while (!RCC_CR & ((int)1 << 25))
     {
     }
+    RCC_CFGR |= 0b10;         // SW PLL
 }
 
 void NVIC_init(void)

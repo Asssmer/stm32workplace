@@ -4,9 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${default}",
-                "C:\\Keil_v5\\Packs/**",
-                "C:\\stm32\\stm32workplace/**"
-                
+                "C:\\Keil_v5\\Packs/**"
             ],
             "defines": [
                 "_DEBUG",
