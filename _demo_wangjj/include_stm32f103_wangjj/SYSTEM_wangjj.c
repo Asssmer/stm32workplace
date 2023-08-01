@@ -1,100 +1,97 @@
 #include "stm32f10x.h"
+#include <stdint.h>
 #include "./SYSTEM_wangjj.h"
+
 // prompt:
-// 请给出完整的代码 : void RCC_Init(uint32_t clock_source)
+// 请给出完整的代码 : void RCC_SetMCOSource(uint32_t mco_source)
 // 1.我在使用STM32C8T6, 我不希望使用HAL库, 我希望使用裸机编程
 // 2.我正在试图编写一个可复用的库
-// 3.我希望函数数量精简, 完整, 健壮
-// 4.不要使用宏定义, 我希望得到的只是一个函数定义
-void RCC_Init(uint32_t clock_source)
+// 3.我希望函数完整, 健壮,去耦合,模块化,干净利落
+// 4.不要使用新的宏定义,不要新的全局定义,这样函数可以去耦合
+// 5.位操作使用stm32f10x.h中的位操作宏,例如:SET_BIT(REG, BIT)
+void RCC_Init()
 {
-    // HSI
-    if (clock_source == 0x00000000)
-    {
-        RCC->CR |= 0x00000001; // Turn on HSI
-        while (!(RCC->CR & 0x00000002))
-            ; // Wait for HSI ready
-    }
-
-    // HSE
-    if (clock_source == 0x00000001)
-    {
-        RCC->CR |= 0x00010000; // Turn on HSE
-        while (!(RCC->CR & 0x00020000))
-            ; // Wait for HSE ready
-    }
-
-    // Set PLL source to HSE
-    RCC->CFGR &= ~0x00010000;
-    RCC->CFGR |= 0x00010000;
-
-    // Set PLL multiplication to 9 (hardcoded to 9 as an example)
-    RCC->CFGR &= ~0x003C0000;
-    RCC->CFGR |= 0x001C0000; // this corresponds to PLLMULL9
-
-    // Enable PLL
-    RCC->CR |= 0x01000000;
-    // Wait till PLL is ready
-    while ((RCC->CR & 0x02000000) == 0)
+    MODIFY_REG(RCC->CFGR, RCC_CFGR_SW, RCC_CFGR_SW_HSI);
+    CLEAR_BIT(RCC->CR, RCC_CR_PLLON);
+    while (READ_BIT(RCC->CR, RCC_CR_PLLRDY))
         ;
-
-    // Select PLL as system clock source
-    RCC->CFGR &= ~0x00000003;
-    RCC->CFGR |= 0x00000002;
-
-    // Wait till PLL is used as system clock source
-    while ((RCC->CFGR & 0x0000000C) != 0x00000008)
+    SET_BIT(RCC->CR, RCC_CR_HSEON);
+    while (!READ_BIT(RCC->CR, RCC_CR_HSERDY))
         ;
-}
+    CLEAR_BIT(RCC->CFGR, RCC_CFGR_PLLXTPRE);
+    SET_BIT(RCC->CFGR, RCC_CFGR_PLLSRC);
+    MODIFY_REG(RCC->CFGR, RCC_CFGR_PLLMULL, RCC_CFGR_PLLMULL9);
+    SET_BIT(RCC->CR, RCC_CR_PLLON);
+    while (!READ_BIT(RCC->CR, RCC_CR_PLLRDY))
+        ;
+    MODIFY_REG(RCC->CFGR, RCC_CFGR_SW, RCC_CFGR_SW_PLL);
 
-void RCC_SetBusPrescalers(uint32_t AHB_Prescaler, uint32_t APB1_Prescaler, uint32_t APB2_Prescaler)
+    //????????????????????????????????????????????????????????????
+    // while (READ_BIT(RCC->CR, RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL)
+    // ;
+}
+void RCC_SetMCO(uint32_t x)
 {
-    // First, clear the related bits
-    RCC->CFGR &= ~(0xF8); // Clear AHB, APB1, and APB2 prescaler bits
-
-    // Now set the prescalers
-    RCC->CFGR |= (AHB_Prescaler << 4);   // AHB prescaler is in bits 7:4
-    RCC->CFGR |= (APB1_Prescaler << 8);  // APB1 prescaler is in bits 10:8
-    RCC->CFGR |= (APB2_Prescaler << 11); // APB2 prescaler is in bits 13:11
+    RCC->APB2ENR |= 1 << 2;                                       // 使能GPIOA时钟GPIOAAAAAAAAAAAAAAAAAAAA
+    *((volatile unsigned int *)(GPIOA_BASE + 0x04)) &= ~(0b1111); // 清除PA8控制位
+    *((volatile unsigned int *)(GPIOA_BASE + 0x04)) |= 0b1011;    // 设置PA8为复用推挽输出
+    MODIFY_REG(RCC->CFGR, RCC_CFGR_MCO, x);
 }
-
-void RCC_EnablePeripheralClock(uint32_t peripheral_bus, uint32_t peripheral_id)
+void RCC_ClockEnable(volatile uint32_t* bus,uint32_t Peripheral, FunctionalState State)
 {
-    // peripheral_bus的值应为1，2，3，分别代表AHB，APB1和APB2总线。
-    // peripheral_id是与目标外设相关的位掩码
-    if (peripheral_bus == 1)
-    { // AHB peripheral
-        RCC->AHBENR |= peripheral_id;
+    if (State != DISABLE)
+    {
+        SET_BIT(*bus, (uint32_t)Peripheral);
     }
-    else if (peripheral_bus == 2)
-    { // APB1 peripheral
-        RCC->APB1ENR |= peripheral_id;
-    }
-    else if (peripheral_bus == 3)
-    { // APB2 peripheral
-        RCC->APB2ENR |= peripheral_id;
+    else
+    {
+        CLEAR_BIT(*bus, (uint32_t)Peripheral);
     }
 }
 
-void RCC_SetMCOSource(uint32_t mco_source)
+// prompt:
+// 请给出完整的代码 : void GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint16_t Pin)
+// 1.我在使用STM32C8T6, 我不希望使用HAL库, 我希望使用裸机编程
+// 2.我正在试图编写一个可复用的库
+// 3.我希望函数完整,健壮,去耦合,模块化,精简
+// 4.不要使用新的宏定义,不要新的全局定义,这样函数可以去耦合
+// 5.位操作使用stm32f10x.h中的位操作宏,例如:SET_BIT(REG, BIT)
+void GPIO_Init(GPIO_TypeDef *GPIOx, uint16_t Pin, uint16_t Mode)
 {
-    // 0x4：系统时钟(SYSCLK)输出
-    // 0x5：内部8MHz的RC振荡器时钟输出
-    // 0x6：外部3-25MHz振荡器时钟输出
-    // 0x7：PLL时钟2分频后输出
-    // 0x8：PLL2时钟输出
-    // 0x9：PLL3时钟2分频后输出
-    // Enable clock for GPIOA
-    RCC->APB2ENR |= 0x00000004;
 
-    // Configure PA8 as alternate function output push-pull
-    GPIOA->CRH &= ~0x0000000F;
-    GPIOA->CRH |= 0x0000000B;
+    if (Pin < 8)
+    {
+        CLEAR_BIT(GPIOx->CRL, (0x0F) << (Pin * 4));
+        SET_BIT(GPIOx->CRL, Mode << (Pin * 4));
+    }
+    else
+    {
+        CLEAR_BIT(GPIOx->CRH, (0x0F) << ((Pin - 8) * 4));
+        SET_BIT(GPIOx->CRH, Mode << ((Pin - 8) * 4));
+    }
+}
+    // 0x00: 输入模式（模拟）
+    // 0x04: 浮空输入
+    // 0x08: 输入模式（下拉）
 
-    // Clear MCO bits
-    RCC->CFGR &= ~0xF0000000;
-
-    // Set MCO source
-    RCC->CFGR |= (mco_source << 24);
+    // 0x01: 输出模式，开漏
+    // 0x02: 输出模式，推挽，2MHz
+    // 0x03: 输出模式，推挽，50MHz
+void GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t Pin, uint8_t Value)
+{
+    if (Value)
+        GPIOx->BSRR |= (uint16_t)1 << Pin;
+    else
+        GPIOx->BRR |= (uint16_t)1 << Pin;
 }
 
+uint8_t GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint16_t Pin)
+{
+    return (GPIOx->IDR >> Pin) & 0x01;
+}
+
+void GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint16_t Pin)
+{
+    uint16_t pinMask = 1 << Pin;
+    GPIOx->ODR ^= pinMask;
+}
