@@ -22,5 +22,11 @@ void GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t Pin, uint8_t Value);
 uint8_t GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t Pin);
 void GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t Pin);
 
+void (*timer_callback)(void) = NULL; // 全局变量
+
+void Timer_Init(TIM_TypeDef* TIMx, uint16_t Mode, uint16_t Period);
+void Timer_Start(TIM_TypeDef* TIMx);
+void Timer_Stop(TIM_TypeDef* TIMx);
+void Timer_SetCallback(TIM_TypeDef* TIMx, void (*Callback)(void));
 
 #endif
