@@ -214,7 +214,7 @@ int main(void)
     TIM2_init();
     USART1_init();
     DHT11_init();
-    log("START!");
+    log("START!12345");
     while (1)
     {
     }
